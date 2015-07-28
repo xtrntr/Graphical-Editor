@@ -1,0 +1,72 @@
+#lang racket
+
+(require (lib "gl.ss" "sgl")
+         (lib "gl-vectors.ss" "sgl")
+
+         (lib "class.ss")
+         (lib "mred.ss" "mred")
+)
+
+(define bm (read-bitmap "model1.jpeg"))
+
+(define (sx-bitmap-new width height)
+  ;(make-object bitmap% width height #f)
+  (let ((config (new gl-config%)))
+    (let* ((b  (make-gl-bitmap width height config))
+           (dc (new bitmap-dc% (bitmap b)))
+           (gl (send dc get-gl-context)))
+      (send dc set-bitmap bm)
+      (display "gl: ")(display gl)(newline)
+      b)))
+ 
+(define (resize w h)
+  (display "resize: ")
+  (sx-bitmap-new 100 100)
+  (glViewport 0 0 w h)
+  #t
+)
+
+(define (draw-opengl)
+  (display "draw: ")
+  (sx-bitmap-new 100 100)
+  (glClearColor 0.0 0.0 0.0 0.0)
+  (glClear GL_COLOR_BUFFER_BIT)
+  (glColor3d 1.0 1.0 1.0)
+ 
+  (glMatrixMode GL_PROJECTION)
+  (glLoadIdentity)
+  (glOrtho 0.0 1.0 0.0 1.0 -1.0 1.0)
+  (glMatrixMode GL_MODELVIEW)
+  (glLoadIdentity)
+
+  (glBegin GL_QUADS)
+  (glVertex3d 0.25 0.25 0.0)
+  (glVertex3d 0.75 0.25 0.0)
+  (glVertex3d 0.75 0.75 0.0)
+  (glVertex3d 0.25 0.75 0.0)
+  (glEnd)
+)
+
+
+(define my-canvas%
+  (class* canvas% ()
+    (inherit with-gl-context swap-gl-buffers)
+    
+   (define/override (on-paint)
+      (with-gl-context
+        (lambda ()
+          (draw-opengl)
+          (swap-gl-buffers))))
+    
+    (define/override (on-size width height)
+      (with-gl-context
+        (lambda ()
+          (resize width height))))
+    
+    (super-instantiate () (style '(gl)))))
+
+(define win (new frame% (label "OpenGl Test") (min-width 200) (min-height 200)))
+(define gl  (new my-canvas% (parent win)))
+
+(sx-bitmap-new 100 100)
+(send win show #t)

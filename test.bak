@@ -1,0 +1,23 @@
+#lang racket/gui
+
+(define (display-bitmap bitmap)
+  (define f
+    (new frame%
+         [label "Bitmap"]
+         [width (send bitmap get-width)]
+         [height (send bitmap get-height)]))
+  (define c (new canvas%
+                 [parent f]
+                 [paint-callback
+                  (lambda (canvas dc)
+                    (send dc translate 10 10)
+                    (send dc rotate .1)
+                    (send dc draw-bitmap bitmap 0 0))]))
+
+  (send f show #t)
+  f)
+(define texture
+  (make-object bitmap%
+               "cauliflower.jpg"
+               'jpeg))
+(display-bitmap texture)
