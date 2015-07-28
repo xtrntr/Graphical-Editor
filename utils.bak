@@ -39,16 +39,16 @@ This module contains all helper functions that can operate on numbers, strings, 
 
 ;2 decimal place
 (: round-2 (-> Real Real))
-(define (round-2 z)
-  (let* ([power (expt 10 2)]
+(define (round-3 z)
+  (let* ([power (expt 10 3)]
          [result (/ (round (* power z)) power)])
     (if (= result -0.0)
         0.0
         result)))
 
-;0 decimal place
-(: round-0 (-> Real Real))
-(define (round-0 z)
+;1 decimal place
+(: round-1 (-> Real Real))
+(define (round-1 z)
   (let* ([power (expt 10 0)]
          [result (/ (round (* power z)) power)])
     (if (= result -0.0)
@@ -57,7 +57,7 @@ This module contains all helper functions that can operate on numbers, strings, 
 
 (: round-to-int (-> Real Exact-Rational))
 (define (round-to-int z)
-  (inexact->exact (round-0 z)))
+  (inexact->exact (round-1 z)))
 
 (: make-whitespaces (-> Real String))
 (define (make-whitespaces x)
